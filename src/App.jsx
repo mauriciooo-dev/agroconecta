@@ -24,7 +24,7 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f5f7f2] text-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-[#021b12] via-[#03351f] to-[#0a7d38] text-gray-800 overflow-hidden">
       {/* NAVBAR */}
       <header className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-xl border-b border-gray-200 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-8 py-5">
@@ -80,7 +80,7 @@ export default function App() {
 
         <div className="relative max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="text-6xl font-extrabold leading-tight text-white mb-8">
+            <h2 className="text-6xl md:text-7xl font-black leading-tight text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.18)] mb-8">
               Transformamos la agricultura de{" "}
               <span className="text-green-300">San Martín</span>
             </h2>
@@ -102,7 +102,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[35px] p-10 shadow-2xl">
+          <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[35px] p-10 shadow-2xl hover:scale-[1.02] transition duration-500">
             <h3 className="text-3xl font-bold text-white mb-8">
               ¿Qué ofrece AgroConecta?
             </h3>
@@ -143,7 +143,7 @@ export default function App() {
           ].map((item, index) => (
             <div
               key={index}
-              className="bg-white rounded-3xl shadow-xl border border-gray-100 p-10 text-center"
+              className="bg-white rounded-3xl shadow-xl border border-gray-100 p-10 text-center transform hover:-translate-y-3 transition duration-500"
             >
               <h3 className="text-5xl font-extrabold text-green-700 mb-3">
                 {item[0]}
@@ -216,7 +216,7 @@ export default function App() {
           {productos.map((producto, index) => (
             <div
               key={index}
-              className="bg-white rounded-[35px] overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-2 transition duration-300 border border-gray-100"
+              className="bg-white rounded-[35px] overflow-hidden shadow-xl hover:shadow-[0_25px_80px_rgba(0,0,0,0.18)] hover:-translate-y-4 transition duration-500 border border-gray-100 group"
             >
               <div className="h-56 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-8xl">
                 {producto.emoji}
@@ -310,7 +310,7 @@ export default function App() {
             </h3>
 
             <p className="text-gray-400 leading-relaxed">
-              Conectando el campo con oportunidades digitales.
+              Conectando el campo tocachino con oportunidades laborales.
             </p>
           </div>
 
@@ -329,9 +329,9 @@ export default function App() {
             <h4 className="text-xl font-bold mb-5">Información</h4>
 
             <ul className="space-y-3 text-gray-400">
-              <li>📍 Tarapoto, Perú</li>
+              <li>📍 TOCACHE, PERU</li>
               <li>📧 contacto@agroconecta.pe</li>
-              <li>📱 +51 999 999 999</li>
+              <li>📱 +51 902 611 359</li>
             </ul>
           </div>
 
