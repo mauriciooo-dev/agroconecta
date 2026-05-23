@@ -1,4 +1,25 @@
+import { useState } from "react";
+import { signInWithPopup } from "firebase/auth";
+
+import { auth, provider } from "./firebase";
 export default function App() {
+  const [user, setUser] = useState(null);
+ const loginGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+
+    setUser(result.user);
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const logout = async () => {
+  await auth.signOut();
+
+  setUser(null);
+};
   const productos = [
     {
       nombre: "Cacao Premium",
@@ -63,10 +84,35 @@ export default function App() {
               Contacto
             </a>
           </nav>
+{
+  user ? (
+    <div className="flex items-center gap-3">
+      <img
+        src={user.photoURL}
+        alt=""
+        className="w-10 h-10 rounded-full border-2 border-white"
+      />
 
-          <button className="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg transition">
-            Iniciar sesión
-          </button>
+      <span className="text-white font-semibold">
+        {user.displayName}
+      </span>
+
+      <button
+        onClick={logout}
+        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-xl text-sm"
+      >
+        Salir
+      </button>
+    </div>
+  ) : (
+    <button
+      onClick={loginGoogle}
+      className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 text-sm rounded-2xl"
+    >
+      Iniciar sesión
+    </button>
+  )
+}
         </div>
       </header>
 
@@ -80,7 +126,7 @@ export default function App() {
 
         <div className="relative max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="text-6xl md:text-7xl font-black leading-tight text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.18)] mb-8">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.18)] mb-8">
               Transformamos la agricultura de{" "}
               <span className="text-green-300">San Martín</span>
             </h2>
@@ -352,5 +398,5 @@ export default function App() {
         </div>
       </footer>
     </div>
-  );
+    );
 }
