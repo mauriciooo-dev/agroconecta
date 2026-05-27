@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signInWithPopup } from "firebase/auth";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
-import { auth, provider } from "./firebase";
+import { auth, provider, db } from "./firebase";
 export default function App() {
   const [user, setUser] = useState(null);
  const loginGoogle = async () => {
@@ -20,29 +21,39 @@ const logout = async () => {
 
   setUser(null);
 };
-  const productos = [
-    {
+const guardarProducto = async () => {
+  try {
+    await addDoc(collection(db, "productos"), {
       nombre: "Cacao Premium",
       productor: "Juan Pérez",
       distrito: "Tarapoto",
       precio: "S/ 8.00 kg",
-      emoji: "🍫",
-    },
-    {
-      nombre: "Café Orgánico",
-      productor: "María Ríos",
-      distrito: "Moyobamba",
-      precio: "S/ 12.00 kg",
-      emoji: "☕",
-    },
-    {
-      nombre: "Plátano Bellaco",
-      productor: "Carlos Díaz",
-      distrito: "Rioja",
-      precio: "S/ 2.50 kg",
-      emoji: "🍌",
-    },
-  ];
+      creado: new Date()
+    });
+
+    alert("Producto guardado 🚀");
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+  const [productos, setProductos] = useState([]);
+
+useEffect(() => {
+  obtenerProductos();
+}, []);
+
+const obtenerProductos = async () => {
+  const querySnapshot = await getDocs(collection(db, "productos"));
+
+  const lista = [];
+
+  querySnapshot.forEach((doc) => {
+    lista.push(doc.data());
+  });
+
+  setProductos(lista);
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#021b12] via-[#03351f] to-[#0a7d38] text-gray-800 overflow-hidden">
@@ -64,13 +75,28 @@ const logout = async () => {
           </div>
 
           <nav className="hidden md:flex gap-10 font-medium text-gray-700">
-            <a href="#" className="hover:text-green-700 transition">
-              Inicio
-            </a>
+            <button
+  onClick={() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }}
+  className="hover:text-green-700 transition"
+>
+  Inicio
+</button>
 
-            <a href="#" className="hover:text-green-700 transition">
-              Productos
-            </a>
+            <button
+  onClick={() => {
+    document.getElementById("productos")?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }}
+  className="hover:text-green-700 transition"
+>
+  Productos
+</button>
 
             <a href="#" className="hover:text-green-700 transition">
               Beneficios
@@ -115,12 +141,21 @@ const logout = async () => {
 }
         </div>
       </header>
+{user && (
+<button
+  onClick={guardarProducto}
 
+  className="fixed top-24 right-6 z-50 bg-yellow-500 text-black px-4 py-2 rounded-2xl"
+>
+  Guardar producto
+</button>
+)}
       {/* HERO */}
+      
       <section className="relative pt-40 pb-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-green-950 via-green-900 to-green-700"></div>
 
-        <div className="absolute inset-0 opacity-20 text-[300px] flex items-center justify-center">
+         <div className="absolute inset-0 opacity-20 text-[300px] flex items-center justify-center">
           🌿
         </div>
 
@@ -138,13 +173,27 @@ const logout = async () => {
             </p>
 
             <div className="flex flex-wrap gap-5">
-              <button className="bg-green-400 hover:bg-green-300 text-green-950 px-8 py-4 rounded-2xl font-bold shadow-2xl transition">
-                Explorar productos
-              </button>
+              <button
+  onClick={() => {
+    document.getElementById("productos")?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }}
+  className="bg-green-400 hover:bg-green-300 text-green-950 px-8 py-4 rounded-2xl font-bold shadow-2xl transition"
+>
+  Explorar productos
+</button>
 
-              <button className="border border-white text-white px-8 py-4 rounded-2xl font-bold hover:bg-white hover:text-green-900 transition">
-                Conocer más
-              </button>
+              <button
+  onClick={() => {
+    document.getElementById("solucion")?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }}
+  className="border border-white text-white px-8 py-4 rounded-2xl font-bold hover:bg-white hover:text-green-900 transition"
+>
+  Conocer más
+</button>
             </div>
           </div>
 
@@ -247,7 +296,10 @@ const logout = async () => {
       </section>
 
       {/* PRODUCTOS */}
-      <section className="max-w-7xl mx-auto px-8 pb-28">
+      <section
+  id="productos"
+  className="max-w-7xl mx-auto px-8 pb-28"
+>
         <div className="text-center mb-20">
           <h2 className="text-5xl font-extrabold text-gray-900 mb-6">
             Productos destacados
@@ -397,6 +449,6 @@ const logout = async () => {
           © 2026 AgroConecta — Proyecto CREA Y EMPRENDE
         </div>
       </footer>
-    </div>
-    );
+        </div>
+  );
 }
