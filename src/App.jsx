@@ -5,6 +5,13 @@ import { collection, addDoc, getDocs } from "firebase/firestore";
 import { auth, provider, db } from "./firebase";
 export default function App() {
   const [user, setUser] = useState(null);
+  const [nombre, setNombre] = useState("");
+const [precio, setPrecio] = useState("");
+const [distrito, setDistrito] = useState("");
+const [productor, setProductor] = useState("");
+
+const [whatsapp, setWhatsapp] = useState("");
+const [mostrarFormulario, setMostrarFormulario] = useState(false);
  const loginGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
@@ -24,14 +31,22 @@ const logout = async () => {
 const guardarProducto = async () => {
   try {
     await addDoc(collection(db, "productos"), {
-      nombre: "Cacao Premium",
-      productor: "Juan Pérez",
-      distrito: "Tarapoto",
-      precio: "S/ 8.00 kg",
-      creado: new Date()
-    });
+  nombre,
+  productor,
+  distrito,
+  precio,
+  whatsapp,
+  creado: new Date()
+});
+obtenerProductos();
 
     alert("Producto guardado 🚀");
+    setNombre("");
+setPrecio("");
+setDistrito("");
+setProductor("");
+setWhatsapp("");  
+setMostrarFormulario(false);
 
   } catch (error) {
     console.log(error);
@@ -143,12 +158,76 @@ const obtenerProductos = async () => {
       </header>
 {user && (
 <button
-  onClick={guardarProducto}
+ onClick={() => setMostrarFormulario(true)}
 
   className="fixed top-24 right-6 z-50 bg-yellow-500 text-black px-4 py-2 rounded-2xl"
 >
   Guardar producto
 </button>
+)}
+{mostrarFormulario && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-2xl w-96">
+      <h2 className="text-2xl font-bold mb-4">
+        Nuevo producto
+      </h2>
+
+      <input
+        type="text"
+        placeholder="Nombre"
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+        className="w-full border p-2 mb-3 rounded"
+      />
+
+      <input
+        type="text"
+        placeholder="Precio"
+        value={precio}
+        onChange={(e) => setPrecio(e.target.value)}
+        className="w-full border p-2 mb-3 rounded"
+      />
+
+      <input
+        type="text"
+        placeholder="Distrito"
+        value={distrito}
+        onChange={(e) => setDistrito(e.target.value)}
+        className="w-full border p-2 mb-3 rounded"
+      />
+
+      <input
+        type="text"
+        placeholder="Productor"
+        value={productor}
+        onChange={(e) => setProductor(e.target.value)}
+        className="w-full border p-2 mb-3 rounded"
+      />
+      <input
+  type="text"
+  placeholder="WhatsApp"
+  value={whatsapp}
+  onChange={(e) => setWhatsapp(e.target.value)}
+  className="w-full border p-2 mb-3 rounded"
+/>
+
+      <div className="flex gap-2">
+        <button
+          onClick={() => setMostrarFormulario(false)}
+          className="bg-gray-300 px-4 py-2 rounded"
+        >
+          Cancelar
+        </button>
+
+        <button
+  onClick={guardarProducto}
+  className="bg-green-600 text-white px-4 py-2 rounded"
+>
+  Guardar
+</button>
+      </div>
+    </div>
+  </div>
 )}
       {/* HERO */}
       
@@ -336,9 +415,14 @@ const obtenerProductos = async () => {
                     {producto.precio}
                   </span>
 
-                  <button className="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-2xl font-semibold transition">
-                    Contactar
-                  </button>
+                 <a
+  href={`https://wa.me/${producto.whatsapp}?text=Hola, vi tu producto ${producto.nombre} en AgroConecta y me interesa.`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-2xl font-semibold transition"
+>
+  📱 WhatsApp
+</a>
                 </div>
               </div>
             </div>
