@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { signInWithPopup } from "firebase/auth";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
 
 import { auth, provider, db } from "./firebase";
 export default function App() {
@@ -9,8 +9,12 @@ export default function App() {
 const [precio, setPrecio] = useState("");
 const [distrito, setDistrito] = useState("");
 const [productor, setProductor] = useState("");
+const [categoria, setCategoria] = useState("Café");
+const [filtroCategoria, setFiltroCategoria] = useState("Todos");
 
 const [whatsapp, setWhatsapp] = useState("");
+const [imagen, setImagen] = useState("");
+const [busqueda, setBusqueda] = useState("");
 const [mostrarFormulario, setMostrarFormulario] = useState(false);
  const loginGoogle = async () => {
   try {
@@ -30,12 +34,16 @@ const logout = async () => {
 };
 const guardarProducto = async () => {
   try {
-    await addDoc(collection(db, "productos"), {
+  await addDoc(collection(db, "productos"), {
   nombre,
   productor,
   distrito,
   precio,
   whatsapp,
+  imagen,
+  categoria,
+  uid: user.uid,
+email: user.email,
   creado: new Date()
 });
 obtenerProductos();
@@ -46,6 +54,8 @@ setPrecio("");
 setDistrito("");
 setProductor("");
 setWhatsapp("");  
+setImagen("");
+setCategoria("Café");
 setMostrarFormulario(false);
 
   } catch (error) {
@@ -53,6 +63,7 @@ setMostrarFormulario(false);
   }
 };
   const [productos, setProductos] = useState([]);
+  const [soloMisProductos, setSoloMisProductos] = useState(false);
 
 useEffect(() => {
   obtenerProductos();
@@ -64,10 +75,23 @@ const obtenerProductos = async () => {
   const lista = [];
 
   querySnapshot.forEach((doc) => {
-    lista.push(doc.data());
+  lista.push({
+    id: doc.id,
+    ...doc.data(),
   });
+});
 
   setProductos(lista);
+};
+const eliminarProducto = async (id) => {
+  const confirmar = window.confirm(
+    "¿Seguro que deseas eliminar este producto?"
+  );
+
+  if (!confirmar) return;
+
+  await deleteDoc(doc(db, "productos", id));
+  obtenerProductos();
 };
 
   return (
@@ -179,6 +203,17 @@ const obtenerProductos = async () => {
         onChange={(e) => setNombre(e.target.value)}
         className="w-full border p-2 mb-3 rounded"
       />
+      <select
+  value={categoria}
+  onChange={(e) => setCategoria(e.target.value)}
+  className="w-full border p-2 mb-3 rounded"
+>
+  <option>Café</option>
+  <option>Cacao</option>
+  <option>Palta</option>
+  <option>Plátano</option>
+  <option>Maíz</option>
+</select>
 
       <input
         type="text"
@@ -208,6 +243,13 @@ const obtenerProductos = async () => {
   placeholder="WhatsApp"
   value={whatsapp}
   onChange={(e) => setWhatsapp(e.target.value)}
+  className="w-full border p-2 mb-3 rounded"
+/>
+<input
+  type="text"
+  placeholder="URL de la imagen"
+  value={imagen}
+  onChange={(e) => setImagen(e.target.value)}
   className="w-full border p-2 mb-3 rounded"
 />
 
@@ -310,8 +352,8 @@ const obtenerProductos = async () => {
       <section className="max-w-7xl mx-auto px-8 -mt-12 relative z-20">
         <div className="grid md:grid-cols-4 gap-6">
           {[
-            ["+120", "Agricultores"],
-            ["+500", "Ventas realizadas"],
+            ["+100", "Agricultores"],
+            ["+150", "Ventas realizadas"],
             ["+15", "Distritos"],
             ["100%", "Productos naturales"],
           ].map((item, index) => (
@@ -388,16 +430,86 @@ const obtenerProductos = async () => {
             Calidad que nace de nuestra tierra
           </p>
         </div>
+ <input
+  type="text"
+  placeholder="Buscar producto..."
+  value={busqueda}
+  onChange={(e) => setBusqueda(e.target.value)}
+ className="w-full mb-8 p-4 border-4 border-red-500 bg-white text-black rounded-2xl"
+ />
+ <div className="flex gap-3 mb-6">
+  <button
+    onClick={() => setSoloMisProductos(false)}
+    className="bg-green-700 text-white px-4 py-2 rounded-xl"
+  >
+    🌱 Todos
+  </button>
 
+  <button
+    onClick={() => setSoloMisProductos(true)}
+    className="bg-blue-700 text-white px-4 py-2 rounded-xl"
+  >
+    👨‍🌾 Mis productos
+    <div className="flex gap-2 mb-6 flex-wrap">
+  <button onClick={() => setFiltroCategoria("Todos")} className="bg-gray-700 text-white px-3 py-2 rounded-xl">
+    Todos
+  </button>
+
+  <button onClick={() => setFiltroCategoria("Café")} className="bg-green-700 text-white px-3 py-2 rounded-xl">
+    ☕ Café
+  </button>
+
+  <button onClick={() => setFiltroCategoria("Cacao")} className="bg-green-700 text-white px-3 py-2 rounded-xl">
+    🍫 Cacao
+  </button>
+
+  <button onClick={() => setFiltroCategoria("Palta")} className="bg-green-700 text-white px-3 py-2 rounded-xl">
+    🥑 Palta
+  </button>
+
+  <button onClick={() => setFiltroCategoria("Plátano")} className="bg-green-700 text-white px-3 py-2 rounded-xl">
+    🍌 Plátano
+  </button>
+
+  <button onClick={() => setFiltroCategoria("Maíz")} className="bg-green-700 text-white px-3 py-2 rounded-xl">
+    🌽 Maíz
+  </button>
+</div>
+  </button>
+</div>
         <div className="grid lg:grid-cols-3 gap-10">
-          {productos.map((producto, index) => (
+         {productos
+  .filter((producto) => {
+    const coincideBusqueda =
+      producto.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      producto.distrito?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      producto.productor?.toLowerCase().includes(busqueda.toLowerCase());
+
+    const coincideUsuario =
+  !soloMisProductos || producto.uid === user?.uid;
+
+const coincideCategoria =
+  filtroCategoria === "Todos" ||
+  producto.categoria === filtroCategoria;
+
+return (
+  coincideBusqueda &&
+  coincideUsuario &&
+  coincideCategoria
+);
+  })
+  .map((producto, index) => (
             <div
               key={index}
               className="bg-white rounded-[35px] overflow-hidden shadow-xl hover:shadow-[0_25px_80px_rgba(0,0,0,0.18)] hover:-translate-y-4 transition duration-500 border border-gray-100 group"
             >
-              <div className="h-56 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-8xl">
-                {producto.emoji}
-              </div>
+              <div className="h-56 overflow-hidden">
+  <img
+    src={producto.imagen}
+    alt={producto.nombre}
+    className="w-full h-full object-cover"
+  />
+</div>
 
               <div className="p-8">
                 <h3 className="text-3xl font-extrabold mb-4">
@@ -415,14 +527,27 @@ const obtenerProductos = async () => {
                     {producto.precio}
                   </span>
 
-                 <a
-  href={`https://wa.me/${producto.whatsapp}?text=Hola, vi tu producto ${producto.nombre} en AgroConecta y me interesa.`}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-2xl font-semibold transition"
->
-  📱 WhatsApp
-</a>
+                 <div className="mt-4 flex gap-2">
+
+  <a
+    href={`https://wa.me/${producto.whatsapp}?text=Hola, vi tu producto ${producto.nombre} en AgroConecta y me interesa.`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex-1 bg-green-700 hover:bg-green-800 text-white py-3 rounded-2xl font-semibold text-center transition"
+  >
+    📱 WhatsApp
+  </a>
+
+  {producto.uid === user?.uid && (
+  <button
+    onClick={() => eliminarProducto(producto.id)}
+    className="bg-red-600 hover:bg-red-700 text-white px-4 rounded-2xl font-bold transition"
+  >
+    🗑️
+  </button>
+)}
+
+</div>
                 </div>
               </div>
             </div>
