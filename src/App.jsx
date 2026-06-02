@@ -63,6 +63,9 @@ setMostrarFormulario(false);
   }
 };
   const [productos, setProductos] = useState([]);
+  const [totalProductos, setTotalProductos] = useState(0);
+const [totalProductores, setTotalProductores] = useState(0);
+const [totalCategorias, setTotalCategorias] = useState(0);
   const [soloMisProductos, setSoloMisProductos] = useState(false);
 
 useEffect(() => {
@@ -81,7 +84,18 @@ const obtenerProductos = async () => {
   });
 });
 
-  setProductos(lista);
+console.log("Productos cargados:", lista);
+console.log("Total:", lista.length);
+setProductos(lista);
+  setTotalProductos(lista.length);
+
+setTotalProductores(
+  new Set(lista.map((p) => p.uid).filter(Boolean)).size
+);
+
+setTotalCategorias(
+  new Set(lista.map((p) => p.categoria).filter(Boolean)).size
+);
 };
 const eliminarProducto = async (id) => {
   const confirmar = window.confirm(
@@ -352,10 +366,12 @@ const eliminarProducto = async (id) => {
       <section className="max-w-7xl mx-auto px-8 -mt-12 relative z-20">
         <div className="grid md:grid-cols-4 gap-6">
           {[
-            ["+100", "Agricultores"],
-            ["+150", "Ventas realizadas"],
-            ["+15", "Distritos"],
-            ["100%", "Productos naturales"],
+           
+  [totalProductos, "Productos"],
+  [totalProductores, "Productores"],
+  [totalCategorias, "Categorías"],
+  ["100%", "Naturales"],
+
           ].map((item, index) => (
             <div
               key={index}
@@ -450,6 +466,7 @@ const eliminarProducto = async (id) => {
     className="bg-blue-700 text-white px-4 py-2 rounded-xl"
   >
     👨‍🌾 Mis productos
+    </button>
     <div className="flex gap-2 mb-6 flex-wrap">
   <button onClick={() => setFiltroCategoria("Todos")} className="bg-gray-700 text-white px-3 py-2 rounded-xl">
     Todos
@@ -475,7 +492,7 @@ const eliminarProducto = async (id) => {
     🌽 Maíz
   </button>
 </div>
-  </button>
+
 </div>
         <div className="grid lg:grid-cols-3 gap-10">
          {productos
