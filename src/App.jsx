@@ -90,7 +90,7 @@ setProductos(lista);
   setTotalProductos(lista.length);
 
 setTotalProductores(
-  new Set(lista.map((p) => p.uid).filter(Boolean)).size
+  new Set(lista.map((p) => p.productor).filter(Boolean)).size
 );
 
 setTotalCategorias(
@@ -529,6 +529,15 @@ return (
 </div>
 
               <div className="p-8">
+                <div className="flex flex-wrap gap-2 mb-3">
+  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+    {producto.categoria}
+  </span>
+
+  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-sm">
+    📍 {producto.distrito}
+  </span>
+</div>
                 <h3 className="text-3xl font-extrabold mb-4">
                   {producto.nombre}
                 </h3>
@@ -543,6 +552,9 @@ return (
                   <span className="text-3xl font-extrabold text-green-700">
                     {producto.precio}
                   </span>
+                  <p className="text-gray-600 text-sm mt-2">
+  👨‍🌾 {producto.productor}
+</p>
 
                  <div className="mt-4 flex gap-2">
 
